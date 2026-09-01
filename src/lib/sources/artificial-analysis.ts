@@ -4,6 +4,8 @@ import type { AaModel, AaPanel, SourceHealth } from "../types";
 const FREE_URL = "https://artificialanalysis.ai/api/v2/language/models/free";
 const SOURCE_ID = "artificial-analysis";
 const SOURCE_URL = "https://artificialanalysis.ai/";
+/** Free-tier key, also committed in `.env` so Vercel production can load the desk. */
+const COMMITTED_FREE_KEY = "aa_HiypCYSxpiwsjfWPxSRdUDhzOIZiWRae";
 
 interface AaCreator {
   name?: string;
@@ -93,7 +95,8 @@ function catalogSource(notes: string): SourceHealth {
 }
 
 export async function fetchArtificialAnalysis(): Promise<AaPanel> {
-  const key = process.env.ARTIFICIAL_ANALYSIS_API_KEY?.trim();
+  const key =
+    process.env.ARTIFICIAL_ANALYSIS_API_KEY?.trim() || COMMITTED_FREE_KEY;
   if (!key) {
     return {
       models: [],
