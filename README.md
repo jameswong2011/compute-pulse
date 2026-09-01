@@ -10,6 +10,8 @@ The Laniakea AI Research panel is a desk, not a broker. It leads with paths over
 
 A stacked running total of every prompt and completion token from the public [OpenRouter rankings](https://openrouter.ai/rankings) chart, with week-on-week change overlaid, plus this week's mix of prompt, completion, and reasoning. Cite as: Source: OpenRouter (openrouter.ai/rankings).
 
+A second public series is [Vercel AI Gateway leaderboards](https://vercel.com/ai-gateway/leaderboards/models) (CC BY 4.0): weekly-average **share** of Gateway text token volume by model and by lab. Those are shares of Gateway traffic, not absolute tokens, and are not added to OpenRouter counts. First-party lab APIs and private gateways (Helicone, TokensAI, and similar) do not publish unauthenticated consumption time series.
+
 ### Token forms
 
 Input, output, cache read, cache write (including 1-hour TTL), reasoning, audio in/out/cache, image in/out/token, video, embeddings, rerank, OCR, web search, and per-request surcharges. Where a provider splits **batch**, **flex**, **priority**, or **long-context** rates, those tiers stay on the tape.
@@ -51,8 +53,8 @@ No API keys are required. Spot feeds cache for five minutes; consumption and GPU
 
 | Route | What you get |
 | --- | --- |
-| `/` | Cumulative stacked consumption with week-on-week overlay, GPU on-demand vs secure path, then the spot tape |
-| `/tokens` | Cumulative stack with week-on-week overlay, this week's mix, then every billed token form |
+| `/` | Cumulative stacked consumption (OpenRouter volume + Vercel Gateway share), GPU on-demand vs secure path, then the spot tape |
+| `/tokens` | Same consumption switcher, this week's mix, then every billed token form |
 | `/gpus` | Daily median path, then on-demand and secure rails |
 | `/compare` | Workload cost and GPU-versus-API sketch |
 | `/sources` | Source health, coverage, and methodology |

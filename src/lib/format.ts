@@ -93,6 +93,13 @@ export function formatPercent(value: number): string {
   return `${sign}${pct.toFixed(digits)}%`;
 }
 
+export function formatShare(value: number): string {
+  if (!Number.isFinite(value)) return "—";
+  const pct = value * 100;
+  const digits = Math.abs(pct) >= 10 ? 0 : 1;
+  return `${pct.toFixed(digits)}%`;
+}
+
 export function formatUsdSmart(value: number, unit: PriceUnit): string {
   if (unit === "usd_per_1m_tokens") {
     if (value === 0) return "$0";

@@ -23,6 +23,7 @@ import { fetchOpenRouter } from "./openrouter";
 import { fetchOpenRouterConsumption } from "./openrouter-consumption";
 import { fetchRunpod } from "./runpod";
 import { fetchVastai } from "./vastai";
+import { fetchVercelGatewayConsumption } from "./vercel-gateway";
 
 function failedSource(
   id: string,
@@ -160,14 +161,17 @@ export async function loadGpuPanel(force = false): Promise<GpuPanel> {
 export async function loadTrends(force = false): Promise<TrendsPanel> {
   if (force) bust(TREND_CACHE_KEY);
   return cached(TREND_CACHE_KEY, TREND_TTL_MS, async () => {
-    const [consumption, history] = await Promise.allSettled([
+    const [consumption, gateway, history] = await Promise.allSettled([
       fetchOpenRouterConsumption(),
+      fetchVercelGatewayConsumption(),
       fetchGpuHistory(),
     ]);
 
     const sources: SourceHealth[] = [];
     let consumptionSeries: TrendsPanel["consumption"] = [];
     let mix: TrendsPanel["mix"] = [];
+    let gatewayShare: TrendsPanel["gatewayShare"] = [];
+    let gatewayLabs: TrendsPanel["gatewayLabs"] = [];
     let gpuLanes: TrendsPanel["gpuLanes"] = [];
 
     if (consumption.status === "fulfilled") {
@@ -184,6 +188,24 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
           "Weekly token consumption",
           "Public rankings chart failed this refresh.",
           consumption.reason,
+        ),
+      );
+    }
+
+    if (gateway.status === "fulfilled") {
+      gatewayShare = gateway.value.models;
+      gatewayLabs = gateway.value.labs;
+      sources.push(gateway.value.source);
+    } else {
+      sources.push(
+        failedSource(
+          "vercel-ai-gateway",
+          "Vercel AI Gateway",
+          "tokens",
+          "https://vercel.com/ai-gateway/leaderboards/models",
+          "Weekly-average share of Gateway text token volume",
+          "Leaderboard export failed this refresh.",
+          gateway.reason,
         ),
       );
     }
@@ -208,6 +230,8 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
     return {
       consumption: consumptionSeries,
       mix,
+      gatewayShare,
+      gatewayLabs,
       gpuLanes,
       sources,
       fetchedAt: nowIso(),

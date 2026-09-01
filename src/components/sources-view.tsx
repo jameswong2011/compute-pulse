@@ -26,7 +26,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Methodology"
         title="An exhaustive public panel."
-        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings. GPU paths come from the public GPU Rental Prices snapshot window, split on-demand vs secure."
+        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings (absolute tokens) and Vercel AI Gateway leaderboards (share of Gateway traffic). GPU paths come from the public GPU Rental Prices snapshot window, split on-demand vs secure."
       />
 
       <div className="mb-6 grid gap-3 md:grid-cols-3">
@@ -37,7 +37,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             </p>
             <p className="mt-2 font-heading text-3xl">{live.length}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Rankings, LiteLLM, RunPod, Vast, rental ledger
+              Rankings, Vercel Gateway, LiteLLM, RunPod, Vast, rental ledger
             </p>
           </CardContent>
         </Card>
@@ -91,13 +91,16 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             mistaken for a token rate.
           </p>
           <p>
-            <span className="text-foreground">Token consumption.</span> The
-            stacked bars are a running total of every prompt and completion
-            token on OpenRouter, split across the largest models. The overlay
-            line is week-on-week change in that week&apos;s volume. The mix
-            table is this week&apos;s prompt, completion, and reasoning split.
-            Cite as OpenRouter (openrouter.ai/rankings). Tokenizers differ by
-            provider.
+            <span className="text-foreground">Token consumption.</span> OpenRouter
+            is the only public feed of absolute prompt and completion tokens
+            over time. The stacked bars are that running total, split across the
+            largest models, with week-on-week volume change overlaid. Vercel AI
+            Gateway leaderboards (CC BY 4.0) add a second series: weekly-average
+            share of Gateway text traffic by model and by lab. Shares are not
+            absolute tokens and are not added to OpenRouter counts. Labs do not
+            publish public consumption APIs. The mix table is still this
+            week&apos;s OpenRouter prompt, completion, and reasoning split.
+            Tokenizers differ by provider.
           </p>
           <p>
             <span className="text-foreground">GPU hours.</span> Marketplace

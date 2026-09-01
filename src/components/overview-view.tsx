@@ -70,7 +70,7 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Public markets · observed over time"
         title="Consumption and rental paths, not just the print."
-        description="The Laniakea AI Research panel tracks the running pile of tokens consumed, week-on-week change in that flow, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
+        description="The Laniakea AI Research panel tracks the running pile of tokens consumed on OpenRouter, share of Vercel AI Gateway traffic, week-on-week change in that flow, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
       />
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -118,7 +118,11 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       </div>
 
       <div className="mb-8">
-        <ConsumptionStackedCard points={data.trends.consumption} />
+        <ConsumptionStackedCard
+          points={data.trends.consumption}
+          gatewayShare={data.trends.gatewayShare}
+          gatewayLabs={data.trends.gatewayLabs}
+        />
       </div>
 
       <div className="mb-8">

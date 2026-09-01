@@ -42,3 +42,11 @@ export function snapshotDateFromPath(path: string): string | null {
   const match = path.match(/(\d{4}-\d{2}-\d{2})\.json$/);
   return match?.[1] ?? null;
 }
+
+/** ISO date of the Monday that starts the UTC week containing `iso`. */
+export function mondayOfIso(iso: string): string {
+  const day = utcDay(new Date(`${iso.slice(0, 10)}T00:00:00Z`));
+  const weekday = day.getUTCDay();
+  const offset = weekday === 0 ? -6 : 1 - weekday;
+  return isoDay(new Date(day.getTime() + offset * 86_400_000));
+}

@@ -149,6 +149,8 @@ export interface GpuLanePoint {
 export interface TrendsPanel {
   consumption: SeriesPoint[];
   mix: ConsumptionMix[];
+  gatewayShare: SeriesPoint[];
+  gatewayLabs: SeriesPoint[];
   gpuLanes: GpuLanePoint[];
   sources: SourceHealth[];
   fetchedAt: string;

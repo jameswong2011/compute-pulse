@@ -82,11 +82,15 @@ export function TokensView({
       <PageHeader
         kicker="Token markets"
         title="What was consumed, then what it costs."
-        description="The running total of every OpenRouter token, stacked by model, with week-on-week change overlaid. This week's mix is prompt, completion, and reasoning. The tape below is still every billed form: cache, audio, image, embeddings, batch, flex, priority."
+        description="OpenRouter absolute token volume, stacked by model, plus Vercel AI Gateway share of its own traffic. This week's mix is still OpenRouter prompt, completion, and reasoning. The tape below is every billed form: cache, audio, image, embeddings, batch, flex, priority."
       />
 
       <div className="mb-6">
-        <ConsumptionStackedCard points={trends.consumption} />
+        <ConsumptionStackedCard
+          points={trends.consumption}
+          gatewayShare={trends.gatewayShare}
+          gatewayLabs={trends.gatewayLabs}
+        />
       </div>
 
       <div className="mb-6">

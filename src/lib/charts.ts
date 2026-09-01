@@ -119,6 +119,27 @@ export function consumptionChart(points: SeriesPoint[]) {
   return consumptionStackedChart(points);
 }
 
+/** Stacked share of a window (0–1), not a running total. */
+export function shareStackedChart(points: SeriesPoint[]) {
+  const keys = rankedKeys(points);
+  const othersIndex = keys.length - 1;
+  const data = points.map((point) => {
+    const flow = weekByKeys(point, keys);
+    const row: Record<string, string | number | null> = {
+      date: point.date.slice(5),
+    };
+    for (const key of keys) row[key] = flow[key] ?? 0;
+    return row;
+  });
+  const labels = seriesLabels(keys);
+  const series = keys.map((key, i) => ({
+    key,
+    label: labels[i],
+    color: i === othersIndex ? COLORS[COLORS.length - 1] : COLORS[i % (COLORS.length - 1)],
+  }));
+  return { data, series, overlay: [] };
+}
+
 export function gpuLaneChart(
   points: GpuLanePoint[],
   gpu: string,

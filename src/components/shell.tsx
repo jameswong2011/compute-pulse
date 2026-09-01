@@ -55,7 +55,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-border/80">
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-1 px-4 py-4 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
           <p>
-            Consumption from OpenRouter rankings. GPU paths from the public
+            Consumption from OpenRouter rankings and Vercel AI Gateway
+            leaderboards. GPU paths from the public
             rental ledger, split on-demand vs secure. Catalog rows are list
             prices, not capacity.
           </p>
