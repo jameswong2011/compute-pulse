@@ -57,8 +57,8 @@ export function AaQualityCard({ analysis }: { analysis: AaPanel }) {
       <CardContent className="px-0">
         {ranked.length === 0 ? (
           <p className="px-4 py-8 text-sm text-muted-foreground">
-            {analysis.source.status === "catalog"
-              ? "Add ARTIFICIAL_ANALYSIS_API_KEY to load the Artificial Analysis desk."
+            {analysis.source.error
+              ? analysis.source.error
               : "No Intelligence Index rows in this refresh."}
           </p>
         ) : (
