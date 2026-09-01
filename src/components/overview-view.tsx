@@ -11,6 +11,7 @@ import {
 import { ConsumptionStackedCard } from "@/components/consumption-trend-card";
 import { AaQualityCard } from "@/components/aa-quality-card";
 import { GpuTrendCard } from "@/components/gpu-trend-card";
+import { OrnnTokenCard } from "@/components/ornn-token-card";
 import { PageHeader } from "@/components/page-header";
 import { SourcePill } from "@/components/source-pill";
 import {
@@ -71,7 +72,7 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Public markets · observed over time"
         title="Consumption and rental paths, not just the print."
-        description="The Laniakea AI Research panel tracks the running pile of tokens consumed on OpenRouter, share of Vercel AI Gateway traffic, Artificial Analysis quality and speed, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
+        description="The Laniakea AI Research panel tracks the running pile of tokens consumed on OpenRouter, share of Vercel AI Gateway traffic, Ornn's public GPU and token-price indices, Artificial Analysis quality and speed, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
       />
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -135,7 +136,12 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
         <GpuTrendCard
           points={data.trends.gpuLanes}
           ledgerPoints={data.trends.gpuLedgerLanes}
+          ornnPoints={data.trends.ornnGpuLanes}
         />
+      </div>
+
+      <div className="mb-8">
+        <OrnnTokenCard points={data.trends.ornnTokenPrices} />
       </div>
 
       <div className="mb-8">

@@ -7,7 +7,7 @@ import { gpuCohorts, gpuLaneChart } from "@/lib/charts";
 import { formatUsd } from "@/lib/format";
 import type { GpuLanePoint } from "@/lib/types";
 
-type GpuSource = "hubbard" | "rental";
+type GpuSource = "hubbard" | "rental" | "ornn";
 
 const SOURCES: Array<{
   id: GpuSource;
@@ -15,6 +15,7 @@ const SOURCES: Array<{
   onDemandLabel: string;
   secureLabel: string;
   fitObserved: boolean;
+  indexOnly?: boolean;
 }> = [
   {
     id: "hubbard",
@@ -30,6 +31,14 @@ const SOURCES: Array<{
     secureLabel: "Secure",
     fitObserved: true,
   },
+  {
+    id: "ornn",
+    label: "Ornn index",
+    onDemandLabel: "Index",
+    secureLabel: "Index",
+    fitObserved: true,
+    indexOnly: true,
+  },
 ];
 
 function pickGpu(cohorts: string[], preferred: string): string {
@@ -41,16 +50,20 @@ function pickGpu(cohorts: string[], preferred: string): string {
 export function GpuTrendCard({
   points,
   ledgerPoints = [],
+  ornnPoints = [],
 }: {
   points: GpuLanePoint[];
   ledgerPoints?: GpuLanePoint[];
+  ornnPoints?: GpuLanePoint[];
 }) {
   const available = useMemo(
     () =>
-      SOURCES.filter((source) =>
-        source.id === "hubbard" ? points.length > 0 : ledgerPoints.length > 0,
-      ),
-    [points.length, ledgerPoints.length],
+      SOURCES.filter((source) => {
+        if (source.id === "hubbard") return points.length > 0;
+        if (source.id === "rental") return ledgerPoints.length > 0;
+        return ornnPoints.length > 0;
+      }),
+    [points.length, ledgerPoints.length, ornnPoints.length],
   );
   const [sourceId, setSourceId] = useState<GpuSource>(
     available[0]?.id ?? "hubbard",
@@ -58,7 +71,12 @@ export function GpuTrendCard({
   const [gpu, setGpu] = useState("H100");
   const activeMeta =
     available.find((s) => s.id === sourceId) ?? available[0] ?? SOURCES[0];
-  const activePoints = activeMeta.id === "rental" ? ledgerPoints : points;
+  const activePoints =
+    activeMeta.id === "rental"
+      ? ledgerPoints
+      : activeMeta.id === "ornn"
+        ? ornnPoints
+        : points;
   const cohorts = useMemo(() => gpuCohorts(activePoints), [activePoints]);
   const selectedGpu = pickGpu(cohorts, gpu);
   const chart = useMemo(
@@ -67,6 +85,7 @@ export function GpuTrendCard({
         fitObserved: activeMeta.fitObserved,
         onDemandLabel: activeMeta.onDemandLabel,
         secureLabel: activeMeta.secureLabel,
+        indexOnly: activeMeta.indexOnly,
       }),
     [activePoints, selectedGpu, activeMeta],
   );
@@ -80,7 +99,9 @@ export function GpuTrendCard({
         <CardTitle className="font-heading text-2xl">
           {activeMeta.id === "rental"
             ? "GPU price path · GPU Rental Prices"
-            : "GPU price path · last 6 months"}
+            : activeMeta.id === "ornn"
+              ? "GPU price path · Ornn index"
+              : "GPU price path · last 6 months"}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           {activeMeta.id === "hubbard" ? (
@@ -90,6 +111,14 @@ export function GpuTrendCard({
               B200, B200+, and A100. Teal is all listings, including spot.
               Brass dashed is firm (non-spot). That ledger has no files from
               10 Mar–6 May 2026, so the line breaks there.
+            </>
+          ) : activeMeta.id === "ornn" ? (
+            <>
+              Ornn Compute Price Index for {selectedGpu}: a
+              transaction-weighted market rate in USD per GPU-hour (H100 is
+              their H100 SXM print; A100 is A100 SXM4). Public Index window
+              is the trailing 3 months, daily. This is not a listing median
+              and is not mixed with Hubbard or GPU Rental Prices.
             </>
           ) : (
             <>
@@ -102,21 +131,33 @@ export function GpuTrendCard({
             </>
           )}
           {latest ? (
-            <>
-              {" "}
-              Latest:{" "}
-              <span className="text-live">
-                {latest.onDemand != null
-                  ? formatUsd(Number(latest.onDemand))
-                  : "—"}
-              </span>
-              {" / "}
-              <span className="text-brass">
-                {latest.secure != null
-                  ? formatUsd(Number(latest.secure))
-                  : "—"}
-              </span>
-            </>
+            activeMeta.id === "ornn" ? (
+              <>
+                {" "}
+                Latest:{" "}
+                <span className="text-live">
+                  {latest.onDemand != null
+                    ? formatUsd(Number(latest.onDemand))
+                    : "—"}
+                </span>
+              </>
+            ) : (
+              <>
+                {" "}
+                Latest:{" "}
+                <span className="text-live">
+                  {latest.onDemand != null
+                    ? formatUsd(Number(latest.onDemand))
+                    : "—"}
+                </span>
+                {" / "}
+                <span className="text-brass">
+                  {latest.secure != null
+                    ? formatUsd(Number(latest.secure))
+                    : "—"}
+                </span>
+              </>
+            )
           ) : null}
         </p>
         {available.length > 1 ? (

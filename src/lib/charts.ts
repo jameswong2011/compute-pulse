@@ -141,6 +141,24 @@ export function shareStackedChart(points: SeriesPoint[]) {
   return { data, series, overlay: [] };
 }
 
+export function ornnTokenChart(points: SeriesPoint[]) {
+  const keys = ["anthropic", "openai", "google", "deepseek"];
+  const labels = ["Anthropic", "OpenAI", "Google", "DeepSeek"];
+  const data = points.map((point) => {
+    const row: Record<string, string | number | null> = {
+      date: point.date.slice(5),
+    };
+    for (const key of keys) row[key] = point.values[key] ?? null;
+    return row;
+  });
+  const series = keys.map((key, i) => ({
+    key,
+    label: labels[i],
+    color: COLORS[i % COLORS.length],
+  }));
+  return { data, series };
+}
+
 export function gpuLaneChart(
   points: GpuLanePoint[],
   gpu: string,
@@ -149,6 +167,7 @@ export function gpuLaneChart(
     fitObserved?: boolean;
     onDemandLabel?: string;
     secureLabel?: string;
+    indexOnly?: boolean;
   },
 ) {
   const scoped = points.filter((p) => p.gpu === gpu);
@@ -166,19 +185,26 @@ export function gpuLaneChart(
       secure: row?.secure ?? null,
     };
   });
-  const series = [
+  const series: Array<{
+    key: string;
+    label: string;
+    color: string;
+    dashed?: boolean;
+  }> = [
     {
       key: "onDemand",
       label: options?.onDemandLabel ?? "On-demand",
       color: "#3dceb0",
     },
-    {
+  ];
+  if (!options?.indexOnly) {
+    series.push({
       key: "secure",
       label: options?.secureLabel ?? "Secure",
       color: "#e0b15a",
       dashed: true,
-    },
-  ];
+    });
+  }
   return { data, series };
 }
 

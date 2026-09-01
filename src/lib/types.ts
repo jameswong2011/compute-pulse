@@ -177,6 +177,8 @@ export interface TrendsPanel {
   gatewayLabs: SeriesPoint[];
   gpuLanes: GpuLanePoint[];
   gpuLedgerLanes: GpuLanePoint[];
+  ornnGpuLanes: GpuLanePoint[];
+  ornnTokenPrices: SeriesPoint[];
   sources: SourceHealth[];
   fetchedAt: string;
 }

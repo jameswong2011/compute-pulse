@@ -56,9 +56,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-1 px-4 py-4 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
           <p>
             Consumption from OpenRouter rankings and Vercel AI Gateway
-            leaderboards. Quality and speed from Artificial Analysis. GPU
-            paths from public listing ledgers. Catalog rows are list prices,
-            not capacity.
+            leaderboards. Token and GPU indices from Ornn Data. Quality and
+            speed from Artificial Analysis. Listing paths from Hubbard and
+            GPU Rental Prices.
           </p>
           <p className="font-mono">USD · refreshed every 5 minutes</p>
         </div>

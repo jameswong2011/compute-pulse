@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConsumptionStackedCard } from "@/components/consumption-trend-card";
+import { OrnnTokenCard } from "@/components/ornn-token-card";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { LiveBadge } from "@/components/source-pill";
@@ -82,7 +83,7 @@ export function TokensView({
       <PageHeader
         kicker="Token markets"
         title="What was consumed, then what it costs."
-        description="OpenRouter absolute token volume, stacked by model, plus Vercel AI Gateway share of its own traffic. This week's mix is still OpenRouter prompt, completion, and reasoning. The tape below is every billed form: cache, audio, image, embeddings, batch, flex, priority."
+        description="OpenRouter absolute token volume, Vercel AI Gateway share, and the Ornn token price index for four labs. This week's mix is still OpenRouter prompt, completion, and reasoning. The tape below is every billed form: cache, audio, image, embeddings, batch, flex, priority."
       />
 
       <div className="mb-6">
@@ -91,6 +92,10 @@ export function TokensView({
           gatewayShare={trends.gatewayShare}
           gatewayLabs={trends.gatewayLabs}
         />
+      </div>
+
+      <div className="mb-6">
+        <OrnnTokenCard points={trends.ornnTokenPrices} />
       </div>
 
       <div className="mb-6">

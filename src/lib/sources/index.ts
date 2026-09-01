@@ -24,6 +24,7 @@ import { fetchGpuRentalPrices } from "./gpurentalprices";
 import { fetchLiteLLM } from "./litellm";
 import { fetchOpenRouter } from "./openrouter";
 import { fetchOpenRouterConsumption } from "./openrouter-consumption";
+import { fetchOrnnGpuHistory, fetchOrnnTokenIndex } from "./ornn";
 import { fetchRunpod } from "./runpod";
 import { fetchVastai } from "./vastai";
 import { fetchVercelGatewayConsumption } from "./vercel-gateway";
@@ -164,11 +165,14 @@ export async function loadGpuPanel(force = false): Promise<GpuPanel> {
 export async function loadTrends(force = false): Promise<TrendsPanel> {
   if (force) bust(TREND_CACHE_KEY);
   return cached(TREND_CACHE_KEY, TREND_TTL_MS, async () => {
-    const [consumption, gateway, history] = await Promise.allSettled([
-      fetchOpenRouterConsumption(),
-      fetchVercelGatewayConsumption(),
-      fetchGpuHistory(),
-    ]);
+    const [consumption, gateway, history, ornnGpu, ornnToken] =
+      await Promise.allSettled([
+        fetchOpenRouterConsumption(),
+        fetchVercelGatewayConsumption(),
+        fetchGpuHistory(),
+        fetchOrnnGpuHistory(),
+        fetchOrnnTokenIndex(),
+      ]);
 
     const sources: SourceHealth[] = [];
     let consumptionSeries: TrendsPanel["consumption"] = [];
@@ -177,6 +181,8 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
     let gatewayLabs: TrendsPanel["gatewayLabs"] = [];
     let gpuLanes: TrendsPanel["gpuLanes"] = [];
     let gpuLedgerLanes: TrendsPanel["gpuLedgerLanes"] = [];
+    let ornnGpuLanes: TrendsPanel["ornnGpuLanes"] = [];
+    let ornnTokenPrices: TrendsPanel["ornnTokenPrices"] = [];
 
     if (consumption.status === "fulfilled") {
       consumptionSeries = consumption.value.consumption;
@@ -232,6 +238,40 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
       );
     }
 
+    if (ornnGpu.status === "fulfilled") {
+      ornnGpuLanes = ornnGpu.value.gpuLanes;
+      sources.push(ornnGpu.value.source);
+    } else {
+      sources.push(
+        failedSource(
+          "ornn-gpu-index",
+          "Ornn GPU index",
+          "gpus",
+          "https://data.ornn.com/",
+          "Public OCPI daily index, trailing 3 months",
+          "Ornn GPU index failed this refresh.",
+          ornnGpu.reason,
+        ),
+      );
+    }
+
+    if (ornnToken.status === "fulfilled") {
+      ornnTokenPrices = ornnToken.value.prices;
+      sources.push(ornnToken.value.source);
+    } else {
+      sources.push(
+        failedSource(
+          "ornn-otpi",
+          "Ornn token price index",
+          "tokens",
+          "https://data.ornn.com/docs/token-price-index",
+          "Public OTPI for four labs, trailing month",
+          "Ornn token index failed this refresh.",
+          ornnToken.reason,
+        ),
+      );
+    }
+
     return {
       consumption: consumptionSeries,
       mix,
@@ -239,6 +279,8 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
       gatewayLabs,
       gpuLanes,
       gpuLedgerLanes,
+      ornnGpuLanes,
+      ornnTokenPrices,
       sources,
       fetchedAt: nowIso(),
     };
