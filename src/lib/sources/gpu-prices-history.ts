@@ -156,7 +156,7 @@ export async function fetchGpuHuntHistory(start?: string): Promise<{
         status: gpuLanes.length ? "ok" : "degraded",
         url: "https://huggingface.co/datasets/afhubbard/gpu-prices",
         coverage:
-          "Daily median USD/GPU-hour over the last 6 months from twice-daily public listings (CC BY 4.0). Teal is all listings; brass is firm (non-spot).",
+          "Daily median USD/GPU-hour over the last 6 months from twice-daily public listings (CC BY 4.0). Teal is all listings; brass is firm (non-spot). No snapshots 10 Mar–6 May 2026.",
         fetchedAt,
         quoteCount: gpuLanes.length,
         notes:

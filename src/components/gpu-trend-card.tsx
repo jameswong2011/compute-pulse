@@ -22,9 +22,12 @@ export function GpuTrendCard({ points }: { points: GpuLanePoint[] }) {
           GPU price path · last 6 months
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Daily median USD per GPU-hour for {gpu} over the last 6 months,
-          from public listing history. Teal is the all-in print (including
-          spot). Brass dashed is firm / secure-cloud.
+          Daily median USD per GPU-hour for {gpu} over the last 6 months
+          from the Hubbard GPU Price Tracker (CC BY 4.0). Teal is all
+          listings, including spot. Brass dashed is firm (non-spot). That
+          ledger has no files from 10 Mar–6 May 2026, so the line breaks
+          there. Recent spot quotes below still come from GPU Rental
+          Prices.
           {latest ? (
             <>
               {" "}

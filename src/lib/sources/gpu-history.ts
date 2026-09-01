@@ -167,7 +167,10 @@ export async function fetchGpuHistory(): Promise<{
   }
 
   if (ledger.status === "fulfilled") {
-    gpuLanes = mergeLanes(gpuLanes, ledger.value.gpuLanes);
+    // Keep the ledger as a cited source for the recent tape, but do not
+    // splice it onto the path. Its basket (verified neocloud offers from
+    // 2026-07-05) sits ~$2 lower than the Hubbard listing median and
+    // would fake a crash in July and a spike on days the ledger is absent.
     sources.push(ledger.value.source);
   } else {
     sources.push({
