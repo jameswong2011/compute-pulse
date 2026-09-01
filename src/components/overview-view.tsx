@@ -70,7 +70,7 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Public markets · observed over time"
         title="Consumption and rental paths, not just the print."
-        description="Meridian tracks the running pile of tokens consumed, week-on-week change in that flow, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
+        description="The Laniakea AI Research panel tracks the running pile of tokens consumed, week-on-week change in that flow, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
       />
 
       <div className="mb-6 flex flex-wrap gap-2">

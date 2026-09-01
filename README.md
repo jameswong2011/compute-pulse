@@ -1,8 +1,8 @@
-# Meridian
+# Laniakea AI Research panel
 
 A research panel for **token consumption**, **token prices**, and **GPU rentals**, drawn from public sources.
 
-Meridian is a desk, not a broker. It leads with paths over time: the running pile of tokens consumed on OpenRouter, week-on-week change in that flow, and daily GPU medians split **on-demand vs secure**. Spot quotes and vendor rate cards stay on the tape. Catalog rows are list prices, not a promise of capacity.
+The Laniakea AI Research panel is a desk, not a broker. It leads with paths over time: the running pile of tokens consumed on OpenRouter, week-on-week change in that flow, and daily GPU medians split **on-demand vs secure**. Spot quotes and vendor rate cards stay on the tape. Catalog rows are list prices, not a promise of capacity.
 
 ## What it tracks
 
@@ -23,7 +23,7 @@ Live token sources:
 
 USD per GPU-hour, normalized from instance price ÷ GPU count, **split on-demand vs secure**.
 
-Daily price paths come from the public [GPU Rental Prices](https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices) snapshot window (CC BY 4.0). On-demand includes list, community, and spot. Secure is secure-cloud and reserved.
+Daily price paths (last 6 months) come from the public [GPU Rental Prices](https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices) snapshot window (CC BY 4.0). On-demand includes list, community, and spot. Secure is secure-cloud and reserved.
 
 Live GPU sources:
 

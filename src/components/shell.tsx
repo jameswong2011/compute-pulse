@@ -20,7 +20,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <Link href="/" className="flex items-baseline gap-2">
-            <span className="font-heading text-2xl tracking-tight">Meridian</span>
+            <span className="font-heading text-2xl tracking-tight">Laniakea AI</span>
             <span className="hidden text-[11px] uppercase tracking-[0.18em] text-muted-foreground sm:inline">
               Research panel
             </span>

@@ -26,7 +26,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Methodology"
         title="An exhaustive public panel."
-        description="Meridian only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings. GPU paths come from the public GPU Rental Prices snapshot window, split on-demand vs secure."
+        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings. GPU paths come from the public GPU Rental Prices snapshot window, split on-demand vs secure."
       />
 
       <div className="mb-6 grid gap-3 md:grid-cols-3">
