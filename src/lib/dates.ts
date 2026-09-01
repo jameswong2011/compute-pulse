@@ -38,6 +38,33 @@ export function gpuPathWindow(now = new Date()): {
   };
 }
 
+/** Daily axis from the first priced day through the last, inclusive. */
+export function observedGpuWindow(
+  points: Array<{ date: string }>,
+  now = new Date(),
+): {
+  start: string;
+  end: string;
+  dates: string[];
+} {
+  const fallback = gpuPathWindow(now);
+  const datesPresent = points
+    .map((p) => p.date)
+    .filter((d) => d >= fallback.start)
+    .sort();
+  if (!datesPresent.length) return fallback;
+  const start = datesPresent[0];
+  const end = datesPresent.at(-1) ?? start;
+  return {
+    start,
+    end,
+    dates: eachUtcDay(
+      utcDay(new Date(`${start}T00:00:00Z`)),
+      utcDay(new Date(`${end}T00:00:00Z`)),
+    ),
+  };
+}
+
 export function snapshotDateFromPath(path: string): string | null {
   const match = path.match(/(\d{4}-\d{2}-\d{2})\.json$/);
   return match?.[1] ?? null;

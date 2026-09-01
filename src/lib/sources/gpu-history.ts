@@ -1,7 +1,7 @@
 import { gpuPathWindow, snapshotDateFromPath } from "../dates";
 import { median } from "../format";
 import { fetchJson, nowIso, SourceError } from "../http";
-import { cohortGpu, laneFromKind } from "../lanes";
+import { laneFromKind, pathCohortGpu } from "../lanes";
 import type { GpuLanePoint, SourceHealth } from "../types";
 import { fetchGpuHuntHistory } from "./gpu-prices-history";
 
@@ -70,7 +70,7 @@ async function fetchLedgerHistory(start: string): Promise<{
     if (!snap?.date || !snap.offers) continue;
     for (const offer of snap.offers) {
       if (!offer.gpu || !offer.kind || !offer.usd_hr || offer.usd_hr <= 0) continue;
-      const gpu = cohortGpu(offer.gpu);
+      const gpu = pathCohortGpu(offer.gpu);
       const lane = laneFromKind(offer.kind);
       if (!gpu || !lane) continue;
       const key = `${snap.date}|${gpu}|${lane}`;
@@ -112,29 +112,18 @@ async function fetchLedgerHistory(start: string): Promise<{
       status: gpuLanes.length ? "ok" : "degraded",
       url: "https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices",
       coverage:
-        "Daily on-demand vs secure median USD/GPU-hour from the public Hugging Face snapshot window",
+        "Daily on-demand vs secure median USD/GPU-hour for H100, H200, B200, B200+, and A100 from the public Hugging Face snapshot window",
       fetchedAt,
       quoteCount: gpuLanes.length,
       notes:
-        "Source: GPU Rental Prices (gpurentalprices.com), CC BY 4.0 daily snapshots from 2026-07-05 through 2026-08-31. Cited for the live quote tape only. Not drawn on the six-month path — that basket sits well below the Hubbard listing median and has no September files yet.",
+        "Source: GPU Rental Prices (gpurentalprices.com), CC BY 4.0. Its own chart: daily on-demand vs secure medians from the public snapshot window (currently 2026-07-05 through 2026-08-31). Not mixed with the Hubbard listing path.",
     },
   };
 }
 
-function mergeLanes(
-  base: GpuLanePoint[],
-  overlay: GpuLanePoint[],
-): GpuLanePoint[] {
-  const byId = new Map<string, GpuLanePoint>();
-  for (const row of base) byId.set(`${row.date}|${row.gpu}`, { ...row });
-  for (const row of overlay) byId.set(`${row.date}|${row.gpu}`, { ...row });
-  return [...byId.values()].sort((a, b) =>
-    a.date === b.date ? a.gpu.localeCompare(b.gpu) : a.date.localeCompare(b.date),
-  );
-}
-
 export async function fetchGpuHistory(): Promise<{
   gpuLanes: GpuLanePoint[];
+  gpuLedgerLanes: GpuLanePoint[];
   sources: SourceHealth[];
 }> {
   const { start } = gpuPathWindow();
@@ -145,9 +134,10 @@ export async function fetchGpuHistory(): Promise<{
 
   const sources: SourceHealth[] = [];
   let gpuLanes: GpuLanePoint[] = [];
+  let gpuLedgerLanes: GpuLanePoint[] = [];
 
   if (hunt.status === "fulfilled") {
-    gpuLanes = mergeLanes(gpuLanes, hunt.value.gpuLanes);
+    gpuLanes = hunt.value.gpuLanes;
     sources.push(hunt.value.source);
   } else {
     sources.push({
@@ -167,10 +157,7 @@ export async function fetchGpuHistory(): Promise<{
   }
 
   if (ledger.status === "fulfilled") {
-    // Keep the ledger as a cited source for the recent tape, but do not
-    // splice it onto the path. Its basket (verified neocloud offers from
-    // 2026-07-05) sits ~$2 lower than the Hubbard listing median and
-    // would fake a crash in July and a spike on days the ledger is absent.
+    gpuLedgerLanes = ledger.value.gpuLanes;
     sources.push(ledger.value.source);
   } else {
     sources.push({
@@ -191,12 +178,12 @@ export async function fetchGpuHistory(): Promise<{
     });
   }
 
-  if (!gpuLanes.length) {
+  if (!gpuLanes.length && !gpuLedgerLanes.length) {
     throw new SourceError(
       "gpu-history",
       "No GPU price-path snapshots loaded.",
     );
   }
 
-  return { gpuLanes, sources };
+  return { gpuLanes, gpuLedgerLanes, sources };
 }

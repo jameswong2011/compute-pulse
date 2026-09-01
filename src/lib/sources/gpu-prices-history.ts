@@ -3,7 +3,7 @@ import { compressors } from "hyparquet-compressors";
 import { gpuPathWindow } from "../dates";
 import { median } from "../format";
 import { fetchBuffer, fetchJson, nowIso, SourceError } from "../http";
-import { cohortGpu } from "../lanes";
+import { pathCohortGpu } from "../lanes";
 import type { GpuLanePoint, SourceHealth } from "../types";
 
 const DATASET_API = "https://huggingface.co/api/datasets/afhubbard/gpu-prices";
@@ -105,7 +105,7 @@ export async function fetchGpuHuntHistory(start?: string): Promise<{
       for (const row of snap.rows) {
         if (row.quality && row.quality !== "ok") continue;
         if (!row.gpu_type) continue;
-        const gpu = cohortGpu(row.gpu_type);
+        const gpu = pathCohortGpu(row.gpu_type);
         if (!gpu) continue;
         const count = toCount(row.gpu_count);
         const price = Number(row.price_per_hour);
@@ -156,7 +156,7 @@ export async function fetchGpuHuntHistory(start?: string): Promise<{
         status: gpuLanes.length ? "ok" : "degraded",
         url: "https://huggingface.co/datasets/afhubbard/gpu-prices",
         coverage:
-          "Daily median USD/GPU-hour over the last 6 months from twice-daily public listings (CC BY 4.0). Teal is all listings; brass is firm (non-spot). No snapshots 10 Mar–6 May 2026.",
+          "Daily median USD/GPU-hour for H100, H200, B200, B200+, and A100 over the last 6 months from twice-daily public listings (CC BY 4.0). Teal is all listings; brass is firm (non-spot). No snapshots 10 Mar–6 May 2026.",
         fetchedAt,
         quoteCount: gpuLanes.length,
         notes:

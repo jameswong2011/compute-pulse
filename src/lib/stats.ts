@@ -1,3 +1,4 @@
+import { cohortGpu, pathCohortGpu } from "./lanes";
 import type { GpuQuote, TokenKind, TokenQuote } from "./types";
 
 const FRONTIER = [
@@ -93,7 +94,11 @@ export function gpuMatrix(quotes: GpuQuote[], gpus: string[], providers: string[
   const cells: Record<string, GpuQuote | undefined> = {};
   for (const q of quotes) {
     if (q.gpu.includes("(median)")) continue;
-    const matchGpu = gpus.find((g) => q.gpu.toUpperCase().includes(g.toUpperCase()));
+    const cohort = pathCohortGpu(q.gpu) ?? cohortGpu(q.gpu);
+    const matchGpu =
+      cohort && gpus.includes(cohort)
+        ? cohort
+        : gpus.find((g) => q.gpu.toUpperCase().includes(g.toUpperCase()));
     if (!matchGpu) continue;
     if (!providers.includes(q.provider)) continue;
     const key = `${q.provider}::${matchGpu}`;

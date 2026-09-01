@@ -24,8 +24,20 @@ export function laneFromKind(kind: string): GpuLane | null {
   return market === "secure" || market === "reserved" ? "secure" : "on_demand";
 }
 
+/** Price-path SKUs. Other marketplace cards stay on the live tape. */
+export const PATH_GPUS = ["H100", "H200", "B200", "B200+", "A100"] as const;
+export type PathGpu = (typeof PATH_GPUS)[number];
+
+export function isPathGpu(name: string): name is PathGpu {
+  return (PATH_GPUS as readonly string[]).includes(name);
+}
+
 export function cohortGpu(name: string): string | null {
-  const n = name.toLowerCase().replace(/_/g, "-");
+  const n = name
+    .toLowerCase()
+    .replace(/_/g, "-")
+    .replace(/^nvidia[\s-]*/, "")
+    .trim();
   if (n.startsWith("h100")) return "H100";
   if (n.startsWith("h200")) return "H200";
   if (n.startsWith("b200")) return "B200";
@@ -37,4 +49,9 @@ export function cohortGpu(name: string): string | null {
   if (n.includes("5090")) return "5090";
   if (n.startsWith("mi300")) return "MI300X";
   return null;
+}
+
+export function pathCohortGpu(name: string): PathGpu | null {
+  const gpu = cohortGpu(name);
+  return gpu && isPathGpu(gpu) ? gpu : null;
 }

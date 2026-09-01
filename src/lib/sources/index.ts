@@ -173,6 +173,7 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
     let gatewayShare: TrendsPanel["gatewayShare"] = [];
     let gatewayLabs: TrendsPanel["gatewayLabs"] = [];
     let gpuLanes: TrendsPanel["gpuLanes"] = [];
+    let gpuLedgerLanes: TrendsPanel["gpuLedgerLanes"] = [];
 
     if (consumption.status === "fulfilled") {
       consumptionSeries = consumption.value.consumption;
@@ -212,6 +213,7 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
 
     if (history.status === "fulfilled") {
       gpuLanes = history.value.gpuLanes;
+      gpuLedgerLanes = history.value.gpuLedgerLanes;
       sources.push(...history.value.sources);
     } else {
       sources.push(
@@ -233,6 +235,7 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
       gatewayShare,
       gatewayLabs,
       gpuLanes,
+      gpuLedgerLanes,
       sources,
       fetchedAt: nowIso(),
     };

@@ -152,6 +152,7 @@ export interface TrendsPanel {
   gatewayShare: SeriesPoint[];
   gatewayLabs: SeriesPoint[];
   gpuLanes: GpuLanePoint[];
+  gpuLedgerLanes: GpuLanePoint[];
   sources: SourceHealth[];
   fetchedAt: string;
 }

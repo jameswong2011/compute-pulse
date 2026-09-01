@@ -26,7 +26,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Methodology"
         title="An exhaustive public panel."
-        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings (absolute tokens) and Vercel AI Gateway leaderboards (share of Gateway traffic). The GPU path is the Hubbard listing median; live GPU quotes come from GPU Rental Prices."
+        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings (absolute tokens) and Vercel AI Gateway leaderboards (share of Gateway traffic). GPU paths are toggled separately: Hubbard listings and GPU Rental Prices are never mixed on one line. Live GPU quotes also come from GPU Rental Prices."
       />
 
       <div className="mb-6 grid gap-3 md:grid-cols-3">
@@ -107,10 +107,13 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             offers are reduced to USD per GPU-hour. The desk splits{" "}
             <span className="text-live">on-demand</span> (list, community, spot)
             from <span className="text-brass">secure</span> (secure-cloud and
-            reserved). The six-month path is the Hubbard GPU Price Tracker
-            listing median (CC BY 4.0). That dataset has no files from 10
-            Mar–6 May 2026. Live quotes come from GPU Rental Prices
-            snapshots; those two baskets are not mixed on one line.
+            reserved). The GPU path card toggles two charts and only tracks
+            H100, H200, B200, B200+, and A100. Hubbard GPU Price Tracker
+            (CC BY 4.0) is the six-month listing median; that dataset has no
+            files from 10 Mar–6 May 2026. GPU Rental Prices (CC BY 4.0) is
+            its own on-demand vs secure path from the public snapshot window
+            (currently 5 Jul–31 Aug 2026). Live quotes use the same rental
+            ledger. The two baskets are never mixed on one line.
           </p>
           <p>
             <span className="text-foreground">Catalog versus live.</span> Brass

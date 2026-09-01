@@ -26,7 +26,7 @@ import {
 } from "@/lib/stats";
 import type { OverviewPanel } from "@/lib/types";
 
-const MATRIX_GPUS = ["B200", "H200", "H100", "A100", "L40S", "4090"];
+const MATRIX_GPUS = ["H100", "H200", "B200", "B200+", "A100"];
 const MATRIX_PROVIDERS = [
   "RunPod",
   "Vast.ai",
@@ -126,7 +126,10 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       </div>
 
       <div className="mb-8">
-        <GpuTrendCard points={data.trends.gpuLanes} />
+        <GpuTrendCard
+          points={data.trends.gpuLanes}
+          ledgerPoints={data.trends.gpuLedgerLanes}
+        />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-5">

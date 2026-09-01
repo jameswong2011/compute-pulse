@@ -1,5 +1,6 @@
-import { gpuPathWindow } from "./dates";
+import { gpuPathWindow, observedGpuWindow } from "./dates";
 import { gpuLane } from "./format";
+import { PATH_GPUS } from "./lanes";
 import type {
   ConsumptionMix,
   GpuLanePoint,
@@ -144,14 +145,20 @@ export function gpuLaneChart(
   points: GpuLanePoint[],
   gpu: string,
   now?: Date,
+  options?: {
+    fitObserved?: boolean;
+    onDemandLabel?: string;
+    secureLabel?: string;
+  },
 ) {
-  const { start, dates } = gpuPathWindow(now);
+  const scoped = points.filter((p) => p.gpu === gpu);
+  const window = options?.fitObserved
+    ? observedGpuWindow(scoped, now)
+    : gpuPathWindow(now);
   const byDate = new Map(
-    points
-      .filter((p) => p.gpu === gpu && p.date >= start)
-      .map((p) => [p.date, p]),
+    scoped.filter((p) => p.date >= window.start).map((p) => [p.date, p]),
   );
-  const data = dates.map((date) => {
+  const data = window.dates.map((date) => {
     const row = byDate.get(date);
     return {
       date: date.slice(5),
@@ -162,12 +169,12 @@ export function gpuLaneChart(
   const series = [
     {
       key: "onDemand",
-      label: "On-demand",
+      label: options?.onDemandLabel ?? "On-demand",
       color: "#3dceb0",
     },
     {
       key: "secure",
-      label: "Secure",
+      label: options?.secureLabel ?? "Secure",
       color: "#e0b15a",
       dashed: true,
     },
@@ -177,7 +184,10 @@ export function gpuLaneChart(
 
 export function gpuCohorts(points: GpuLanePoint[], now?: Date): string[] {
   const { start } = gpuPathWindow(now);
-  return [...new Set(points.filter((p) => p.date >= start).map((p) => p.gpu))].sort();
+  const present = new Set(
+    points.filter((p) => p.date >= start).map((p) => p.gpu),
+  );
+  return PATH_GPUS.filter((gpu) => present.has(gpu));
 }
 
 export function splitByLane(quotes: GpuQuote[]) {
