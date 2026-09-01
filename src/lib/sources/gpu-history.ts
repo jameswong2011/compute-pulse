@@ -116,7 +116,7 @@ async function fetchLedgerHistory(start: string): Promise<{
       fetchedAt,
       quoteCount: gpuLanes.length,
       notes:
-        "Source: GPU Rental Prices (gpurentalprices.com), CC BY 4.0 daily snapshots since 2026-07-05. Used for the recent end of the 6-month path when present.",
+        "Source: GPU Rental Prices (gpurentalprices.com), CC BY 4.0 daily snapshots from 2026-07-05 through 2026-08-31. Cited for the live quote tape only. Not drawn on the six-month path — that basket sits well below the Hubbard listing median and has no September files yet.",
     },
   };
 }
