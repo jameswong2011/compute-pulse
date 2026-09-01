@@ -25,5 +25,6 @@ export function bust(key?: string) {
 export const TOKEN_CACHE_KEY = "tokens";
 export const GPU_CACHE_KEY = "gpus";
 export const TREND_CACHE_KEY = "trends-gpu-sources";
+export const AA_CACHE_KEY = "artificial-analysis";
 export const CACHE_TTL_MS = 5 * 60 * 1000;
 export const TREND_TTL_MS = 30 * 60 * 1000;

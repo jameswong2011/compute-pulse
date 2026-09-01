@@ -17,6 +17,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
     ...data.tokens.sources,
     ...data.gpus.sources,
     ...data.trends.sources,
+    data.analysis.source,
   ];
   const live = sources.filter((s) => s.kind === "live");
   const catalog = sources.filter((s) => s.kind === "catalog");
@@ -26,7 +27,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Methodology"
         title="An exhaustive public panel."
-        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings (absolute tokens) and Vercel AI Gateway leaderboards (share of Gateway traffic). GPU paths are toggled separately: Hubbard listings and GPU Rental Prices are never mixed on one line. Live GPU quotes also come from GPU Rental Prices."
+        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings (absolute tokens) and Vercel AI Gateway leaderboards (share of Gateway traffic). Quality, speed, and an independent price tape come from Artificial Analysis when a key is set. GPU paths are toggled separately: Hubbard listings and GPU Rental Prices are never mixed on one line."
       />
 
       <div className="mb-6 grid gap-3 md:grid-cols-3">
@@ -101,6 +102,21 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             publish public consumption APIs. The mix table is still this
             week&apos;s OpenRouter prompt, completion, and reasoning split.
             Tokenizers differ by provider.
+          </p>
+          <p>
+            <span className="text-foreground">Quality and speed.</span>{" "}
+            Artificial Analysis (free language-model API) supplies the
+            Intelligence, Coding, and Agentic indices, independent input/output
+            list prices, median output tokens/sec, and time-to-first-token.
+            Attribution:{" "}
+            <a
+              href="https://artificialanalysis.ai/"
+              className="underline-offset-4 hover:underline"
+            >
+              artificialanalysis.ai
+            </a>
+            . This is not token consumption. A key is required; without it the
+            desk stays empty, same pattern as Lambda.
           </p>
           <p>
             <span className="text-foreground">GPU hours.</span> Marketplace

@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ConsumptionStackedCard } from "@/components/consumption-trend-card";
+import { AaQualityCard } from "@/components/aa-quality-card";
 import { GpuTrendCard } from "@/components/gpu-trend-card";
 import { PageHeader } from "@/components/page-header";
 import { SourcePill } from "@/components/source-pill";
@@ -70,11 +71,16 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Public markets · observed over time"
         title="Consumption and rental paths, not just the print."
-        description="The Laniakea AI Research panel tracks the running pile of tokens consumed on OpenRouter, share of Vercel AI Gateway traffic, week-on-week change in that flow, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
+        description="The Laniakea AI Research panel tracks the running pile of tokens consumed on OpenRouter, share of Vercel AI Gateway traffic, Artificial Analysis quality and speed, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
       />
 
       <div className="mb-6 flex flex-wrap gap-2">
-        {[...data.tokens.sources, ...data.gpus.sources, ...data.trends.sources]
+        {[
+          ...data.tokens.sources,
+          ...data.gpus.sources,
+          ...data.trends.sources,
+          data.analysis.source,
+        ]
           .filter((s) => s.kind === "live" || s.quoteCount > 0)
           .slice(0, 14)
           .map((source) => (
@@ -130,6 +136,10 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
           points={data.trends.gpuLanes}
           ledgerPoints={data.trends.gpuLedgerLanes}
         />
+      </div>
+
+      <div className="mb-8">
+        <AaQualityCard analysis={data.analysis} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-5">

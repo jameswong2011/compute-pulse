@@ -1,4 +1,5 @@
 import {
+  AA_CACHE_KEY,
   CACHE_TTL_MS,
   TREND_TTL_MS,
   cached,
@@ -9,12 +10,14 @@ import {
 } from "../cache";
 import { nowIso } from "../http";
 import type {
+  AaPanel,
   GpuPanel,
   OverviewPanel,
   SourceHealth,
   TokenPanel,
   TrendsPanel,
 } from "../types";
+import { fetchArtificialAnalysis } from "./artificial-analysis";
 import { fetchCatalog } from "./catalog";
 import { fetchGpuHistory } from "./gpu-history";
 import { fetchGpuRentalPrices } from "./gpurentalprices";
@@ -242,11 +245,39 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
   });
 }
 
+function emptyAaPanel(error?: unknown): AaPanel {
+  return {
+    models: [],
+    indexVersion: null,
+    source: failedSource(
+      "artificial-analysis",
+      "Artificial Analysis",
+      "tokens",
+      "https://artificialanalysis.ai/",
+      "Intelligence, coding, speed, and independent list prices",
+      "Free language-model desk failed this refresh.",
+      error ?? new Error("Not loaded"),
+    ),
+  };
+}
+
+export async function loadAnalysis(force = false): Promise<AaPanel> {
+  if (force) bust(AA_CACHE_KEY);
+  return cached(AA_CACHE_KEY, TREND_TTL_MS, async () => {
+    try {
+      return await fetchArtificialAnalysis();
+    } catch (error) {
+      return emptyAaPanel(error);
+    }
+  });
+}
+
 export async function loadOverview(force = false): Promise<OverviewPanel> {
-  const [tokens, gpus, trends] = await Promise.all([
+  const [tokens, gpus, trends, analysis] = await Promise.all([
     loadTokenPanel(force),
     loadGpuPanel(force),
     loadTrends(force),
+    loadAnalysis(force),
   ]);
-  return { tokens, gpus, trends, fetchedAt: nowIso() };
+  return { tokens, gpus, trends, analysis, fetchedAt: nowIso() };
 }

@@ -1,5 +1,5 @@
 import { cohortGpu, pathCohortGpu } from "./lanes";
-import type { GpuQuote, TokenKind, TokenQuote } from "./types";
+import type { AaModel, GpuQuote, TokenKind, TokenQuote } from "./types";
 
 const FRONTIER = [
   "claude-opus",
@@ -28,6 +28,31 @@ export function isFrontier(model: string): boolean {
 
 export function unique<T>(values: T[]): T[] {
   return [...new Set(values)];
+}
+
+function normId(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+export function matchAaModel(
+  models: AaModel[],
+  name: string,
+  modelId?: string,
+): AaModel | undefined {
+  const needle = normId(modelId || name);
+  if (!needle) return undefined;
+  return (
+    models.find((m) => normId(m.slug) === needle || normId(m.name) === needle) ??
+    models.find((m) => {
+      const slug = normId(m.slug);
+      const label = normId(m.name);
+      return (
+        (slug.length > 4 && needle.includes(slug)) ||
+        (label.length > 6 && needle.includes(label)) ||
+        (slug.length > 4 && slug.includes(needle))
+      );
+    })
+  );
 }
 
 export function cheapestInput(quotes: TokenQuote[]): TokenQuote | undefined {

@@ -20,7 +20,13 @@ import {
 } from "@/components/ui/table";
 import { PageHeader } from "@/components/page-header";
 import { formatUsd, formatUsdSmart, MARKET_LABEL } from "@/lib/format";
-import { isFrontier, modelRows, unique, workloadCost } from "@/lib/stats";
+import {
+  isFrontier,
+  matchAaModel,
+  modelRows,
+  unique,
+  workloadCost,
+} from "@/lib/stats";
 import type { GpuQuote, OverviewPanel } from "@/lib/types";
 
 const TOK_PER_SEC: Record<string, number> = {
@@ -72,6 +78,12 @@ export function CompareView({ data }: { data: OverviewPanel }) {
 
   const leftRow = models.find((m) => m.key === left);
   const rightRow = models.find((m) => m.key === right);
+  const leftAa = leftRow
+    ? matchAaModel(data.analysis.models, leftRow.model, leftRow.modelId)
+    : undefined;
+  const rightAa = rightRow
+    ? matchAaModel(data.analysis.models, rightRow.model, rightRow.modelId)
+    : undefined;
   const gpu = gpus.find((g) => g.id === gpuId);
 
   const leftCost = leftRow
@@ -114,7 +126,7 @@ export function CompareView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Scenario desk"
         title="Tokens against silicon."
-        description="Price a prompt workload across models, then see how many generated tokens a rented GPU would need to emit before the API is cheaper. Throughput is a conservative 70B-class decode estimate, not a benchmark."
+        description="Price a prompt workload across models, then see how many generated tokens a rented GPU would need to emit before the API is cheaper. When Artificial Analysis has the model, decode speed and TTFT are their measured medians. GPU-side tokens/sec is still a conservative 70B-class estimate."
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
@@ -172,6 +184,9 @@ export function CompareView({ data }: { data: OverviewPanel }) {
           amount={leftCost}
           input={leftRow?.prices.input}
           output={leftRow?.prices.output}
+          intelligence={leftAa?.intelligence}
+          tokensPerSec={leftAa?.tokensPerSec}
+          ttftSec={leftAa?.ttftSec}
         />
         <CostCard
           title={rightRow?.model ?? "Right model"}
@@ -179,6 +194,9 @@ export function CompareView({ data }: { data: OverviewPanel }) {
           amount={rightCost}
           input={rightRow?.prices.input}
           output={rightRow?.prices.output}
+          intelligence={rightAa?.intelligence}
+          tokensPerSec={rightAa?.tokensPerSec}
+          ttftSec={rightAa?.ttftSec}
         />
       </div>
 
@@ -371,12 +389,18 @@ function CostCard({
   amount,
   input,
   output,
+  intelligence,
+  tokensPerSec,
+  ttftSec,
 }: {
   title: string;
   hint: string;
   amount: number;
   input?: number;
   output?: number;
+  intelligence?: number | null;
+  tokensPerSec?: number | null;
+  ttftSec?: number | null;
 }) {
   return (
     <Card>
@@ -397,6 +421,18 @@ function CostCard({
             ? `${formatUsdSmart(output, "usd_per_1m_tokens")} out`
             : "—"}
         </p>
+        {intelligence != null || tokensPerSec != null || ttftSec != null ? (
+          <p className="mt-1 text-xs text-muted-foreground">
+            AA
+            {intelligence != null ? ` · intel ${intelligence.toFixed(1)}` : ""}
+            {tokensPerSec != null
+              ? ` · ${Math.round(tokensPerSec)} tok/s`
+              : ""}
+            {ttftSec != null
+              ? ` · TTFT ${ttftSec >= 10 ? ttftSec.toFixed(0) : ttftSec.toFixed(1)}s`
+              : ""}
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   );
