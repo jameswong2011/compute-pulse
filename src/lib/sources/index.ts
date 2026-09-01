@@ -212,16 +212,16 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
 
     if (history.status === "fulfilled") {
       gpuLanes = history.value.gpuLanes;
-      sources.push(history.value.source);
+      sources.push(...history.value.sources);
     } else {
       sources.push(
         failedSource(
-          "gpurentalprices-history",
-          "GPU Rental Prices ledger",
+          "gpu-history",
+          "GPU price path",
           "gpus",
-          "https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices",
-          "Daily on-demand vs secure medians",
-          "Snapshot window failed this refresh.",
+          "https://huggingface.co/datasets/afhubbard/gpu-prices",
+          "Daily medians over the last 6 months",
+          "Price-path sources failed this refresh.",
           history.reason,
         ),
       );

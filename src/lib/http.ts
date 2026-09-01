@@ -30,6 +30,28 @@ export async function fetchJson<T>(
   }
 }
 
+export async function fetchBuffer(
+  url: string,
+  init: RequestInit & { timeoutMs?: number } = {},
+): Promise<ArrayBuffer> {
+  const { timeoutMs = 25_000, ...rest } = init;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      ...rest,
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    }
+    return await res.arrayBuffer();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function nowIso(): string {
   return new Date().toISOString();
 }

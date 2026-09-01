@@ -108,7 +108,8 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             <span className="text-live">on-demand</span> (list, community, spot)
             from <span className="text-brass">secure</span> (secure-cloud and
             reserved). The path is the daily median by SKU and rail from the
-            GPU Rental Prices Hugging Face snapshots, CC BY 4.0.
+            Hubbard GPU Price Tracker (six months) and the GPU Rental Prices
+            Hugging Face snapshots (from 2026-07-05), both CC BY 4.0.
           </p>
           <p>
             <span className="text-foreground">Catalog versus live.</span> Brass

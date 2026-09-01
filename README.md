@@ -25,7 +25,7 @@ Live token sources:
 
 USD per GPU-hour, normalized from instance price ÷ GPU count, **split on-demand vs secure**.
 
-Daily price paths (last 6 months) come from the public [GPU Rental Prices](https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices) snapshot window (CC BY 4.0). On-demand includes list, community, and spot. Secure is secure-cloud and reserved.
+Daily price paths (last 6 months) come from the public [GPU Price Tracker](https://huggingface.co/datasets/afhubbard/gpu-prices) listings (CC BY 4.0, since January 2026), with the recent window overlaid from [GPU Rental Prices](https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices) when those snapshots exist. On-demand includes list, community, and spot. Secure is secure-cloud and reserved.
 
 Live GPU sources:
 

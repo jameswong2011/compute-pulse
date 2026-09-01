@@ -11,7 +11,9 @@ export function GpuTrendCard({ points }: { points: GpuLanePoint[] }) {
   const cohorts = useMemo(() => gpuCohorts(points), [points]);
   const [gpu, setGpu] = useState(cohorts.includes("H100") ? "H100" : (cohorts[0] ?? "H100"));
   const chart = useMemo(() => gpuLaneChart(points, gpu), [points, gpu]);
-  const latest = chart.data.at(-1);
+  const latest = [...chart.data]
+    .reverse()
+    .find((row) => row.onDemand != null || row.secure != null);
 
   return (
     <Card className="overflow-visible">
@@ -20,9 +22,9 @@ export function GpuTrendCard({ points }: { points: GpuLanePoint[] }) {
           GPU price path · last 6 months
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Daily median USD per GPU-hour for {gpu} over the last 6 months.
-          Teal is on-demand (including community and spot). Brass dashed is
-          secure-cloud / reserved.
+          Daily median USD per GPU-hour for {gpu} over the last 6 months,
+          from public listing history. Teal is the all-in print (including
+          spot). Brass dashed is firm / secure-cloud.
           {latest ? (
             <>
               {" "}
