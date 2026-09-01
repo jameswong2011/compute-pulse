@@ -21,7 +21,7 @@ const serif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Meridian — Token & GPU research panel",
+  title: "Laniakea AI Research panel",
   description:
     "A research panel that tracks every public form of token pricing and GPU rental rates across live marketplaces and vendor rate cards.",
 };

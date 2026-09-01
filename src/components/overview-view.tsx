@@ -9,7 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ConsumptionStackedCard } from "@/components/consumption-trend-card";
+import { AaQualityCard } from "@/components/aa-quality-card";
 import { GpuTrendCard } from "@/components/gpu-trend-card";
+import { OrnnTokenCard } from "@/components/ornn-token-card";
 import { PageHeader } from "@/components/page-header";
 import { SourcePill } from "@/components/source-pill";
 import {
@@ -26,7 +28,7 @@ import {
 } from "@/lib/stats";
 import type { OverviewPanel } from "@/lib/types";
 
-const MATRIX_GPUS = ["B200", "H200", "H100", "A100", "L40S", "4090"];
+const MATRIX_GPUS = ["H100", "H200", "B200", "B200+", "A100"];
 const MATRIX_PROVIDERS = [
   "RunPod",
   "Vast.ai",
@@ -70,11 +72,16 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Public markets · observed over time"
         title="Consumption and rental paths, not just the print."
-        description="Meridian tracks the running pile of tokens consumed, week-on-week change in that flow, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
+        description="The Laniakea AI Research panel tracks weekly token volume on OpenRouter, share of Vercel AI Gateway traffic, Ornn's public GPU and token-price indices, Artificial Analysis quality and speed, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
       />
 
       <div className="mb-6 flex flex-wrap gap-2">
-        {[...data.tokens.sources, ...data.gpus.sources, ...data.trends.sources]
+        {[
+          ...data.tokens.sources,
+          ...data.gpus.sources,
+          ...data.trends.sources,
+          data.analysis.source,
+        ]
           .filter((s) => s.kind === "live" || s.quoteCount > 0)
           .slice(0, 14)
           .map((source) => (
@@ -118,11 +125,27 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       </div>
 
       <div className="mb-8">
-        <ConsumptionStackedCard points={data.trends.consumption} />
+        <ConsumptionStackedCard
+          points={data.trends.consumption}
+          gatewayShare={data.trends.gatewayShare}
+          gatewayLabs={data.trends.gatewayLabs}
+        />
       </div>
 
       <div className="mb-8">
-        <GpuTrendCard points={data.trends.gpuLanes} />
+        <GpuTrendCard
+          points={data.trends.gpuLanes}
+          ledgerPoints={data.trends.gpuLedgerLanes}
+          ornnPoints={data.trends.ornnGpuLanes}
+        />
+      </div>
+
+      <div className="mb-8">
+        <OrnnTokenCard points={data.trends.ornnTokenPrices} />
+      </div>
+
+      <div className="mb-8">
+        <AaQualityCard analysis={data.analysis} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-5">

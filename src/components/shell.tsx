@@ -20,7 +20,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <Link href="/" className="flex items-baseline gap-2">
-            <span className="font-heading text-2xl tracking-tight">Meridian</span>
+            <span className="font-heading text-2xl tracking-tight">Laniakea AI</span>
             <span className="hidden text-[11px] uppercase tracking-[0.18em] text-muted-foreground sm:inline">
               Research panel
             </span>
@@ -55,9 +55,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <footer className="border-t border-border/80">
         <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-1 px-4 py-4 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
           <p>
-            Consumption from OpenRouter rankings. GPU paths from the public
-            rental ledger, split on-demand vs secure. Catalog rows are list
-            prices, not capacity.
+            Consumption from OpenRouter rankings and Vercel AI Gateway
+            leaderboards. Token and GPU indices from Ornn Data. Quality and
+            speed from Artificial Analysis. Listing paths from Hubbard and
+            GPU Rental Prices.
           </p>
           <p className="font-mono">USD · refreshed every 5 minutes</p>
         </div>

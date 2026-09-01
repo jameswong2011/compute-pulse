@@ -1,4 +1,5 @@
 import {
+  AA_CACHE_KEY,
   CACHE_TTL_MS,
   TREND_TTL_MS,
   cached,
@@ -9,20 +10,24 @@ import {
 } from "../cache";
 import { nowIso } from "../http";
 import type {
+  AaPanel,
   GpuPanel,
   OverviewPanel,
   SourceHealth,
   TokenPanel,
   TrendsPanel,
 } from "../types";
+import { fetchArtificialAnalysis } from "./artificial-analysis";
 import { fetchCatalog } from "./catalog";
 import { fetchGpuHistory } from "./gpu-history";
 import { fetchGpuRentalPrices } from "./gpurentalprices";
 import { fetchLiteLLM } from "./litellm";
 import { fetchOpenRouter } from "./openrouter";
 import { fetchOpenRouterConsumption } from "./openrouter-consumption";
+import { fetchOrnnGpuHistory, fetchOrnnTokenIndex } from "./ornn";
 import { fetchRunpod } from "./runpod";
 import { fetchVastai } from "./vastai";
+import { fetchVercelGatewayConsumption } from "./vercel-gateway";
 
 function failedSource(
   id: string,
@@ -160,15 +165,24 @@ export async function loadGpuPanel(force = false): Promise<GpuPanel> {
 export async function loadTrends(force = false): Promise<TrendsPanel> {
   if (force) bust(TREND_CACHE_KEY);
   return cached(TREND_CACHE_KEY, TREND_TTL_MS, async () => {
-    const [consumption, history] = await Promise.allSettled([
-      fetchOpenRouterConsumption(),
-      fetchGpuHistory(),
-    ]);
+    const [consumption, gateway, history, ornnGpu, ornnToken] =
+      await Promise.allSettled([
+        fetchOpenRouterConsumption(),
+        fetchVercelGatewayConsumption(),
+        fetchGpuHistory(),
+        fetchOrnnGpuHistory(),
+        fetchOrnnTokenIndex(),
+      ]);
 
     const sources: SourceHealth[] = [];
     let consumptionSeries: TrendsPanel["consumption"] = [];
     let mix: TrendsPanel["mix"] = [];
+    let gatewayShare: TrendsPanel["gatewayShare"] = [];
+    let gatewayLabs: TrendsPanel["gatewayLabs"] = [];
     let gpuLanes: TrendsPanel["gpuLanes"] = [];
+    let gpuLedgerLanes: TrendsPanel["gpuLedgerLanes"] = [];
+    let ornnGpuLanes: TrendsPanel["ornnGpuLanes"] = [];
+    let ornnTokenPrices: TrendsPanel["ornnTokenPrices"] = [];
 
     if (consumption.status === "fulfilled") {
       consumptionSeries = consumption.value.consumption;
@@ -188,19 +202,72 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
       );
     }
 
-    if (history.status === "fulfilled") {
-      gpuLanes = history.value.gpuLanes;
-      sources.push(history.value.source);
+    if (gateway.status === "fulfilled") {
+      gatewayShare = gateway.value.models;
+      gatewayLabs = gateway.value.labs;
+      sources.push(gateway.value.source);
     } else {
       sources.push(
         failedSource(
-          "gpurentalprices-history",
-          "GPU Rental Prices ledger",
+          "vercel-ai-gateway",
+          "Vercel AI Gateway",
+          "tokens",
+          "https://vercel.com/ai-gateway/leaderboards/models",
+          "Weekly-average share of Gateway text token volume",
+          "Leaderboard export failed this refresh.",
+          gateway.reason,
+        ),
+      );
+    }
+
+    if (history.status === "fulfilled") {
+      gpuLanes = history.value.gpuLanes;
+      gpuLedgerLanes = history.value.gpuLedgerLanes;
+      sources.push(...history.value.sources);
+    } else {
+      sources.push(
+        failedSource(
+          "gpu-history",
+          "GPU price path",
           "gpus",
-          "https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices",
-          "Daily on-demand vs secure medians",
-          "Snapshot window failed this refresh.",
+          "https://huggingface.co/datasets/afhubbard/gpu-prices",
+          "Daily medians over the last 6 months",
+          "Price-path sources failed this refresh.",
           history.reason,
+        ),
+      );
+    }
+
+    if (ornnGpu.status === "fulfilled") {
+      ornnGpuLanes = ornnGpu.value.gpuLanes;
+      sources.push(ornnGpu.value.source);
+    } else {
+      sources.push(
+        failedSource(
+          "ornn-gpu-index",
+          "Ornn GPU index",
+          "gpus",
+          "https://data.ornn.com/",
+          "Public OCPI daily index, trailing 3 months",
+          "Ornn GPU index failed this refresh.",
+          ornnGpu.reason,
+        ),
+      );
+    }
+
+    if (ornnToken.status === "fulfilled") {
+      ornnTokenPrices = ornnToken.value.prices;
+      sources.push(ornnToken.value.source);
+    } else {
+      sources.push(
+        failedSource(
+          "ornn-otpi",
+          "Ornn token price index",
+          "tokens",
+          "https://data.ornn.com/docs/token-price-index",
+          "Public OTPI for four labs, trailing month",
+          "Ornn token index failed this refresh.",
+          ornnToken.reason,
         ),
       );
     }
@@ -208,18 +275,51 @@ export async function loadTrends(force = false): Promise<TrendsPanel> {
     return {
       consumption: consumptionSeries,
       mix,
+      gatewayShare,
+      gatewayLabs,
       gpuLanes,
+      gpuLedgerLanes,
+      ornnGpuLanes,
+      ornnTokenPrices,
       sources,
       fetchedAt: nowIso(),
     };
   });
 }
 
+function emptyAaPanel(error?: unknown): AaPanel {
+  return {
+    models: [],
+    indexVersion: null,
+    source: failedSource(
+      "artificial-analysis",
+      "Artificial Analysis",
+      "tokens",
+      "https://artificialanalysis.ai/",
+      "Intelligence, coding, speed, and independent list prices",
+      "Free language-model desk failed this refresh.",
+      error ?? new Error("Not loaded"),
+    ),
+  };
+}
+
+export async function loadAnalysis(force = false): Promise<AaPanel> {
+  if (force) bust(AA_CACHE_KEY);
+  return cached(AA_CACHE_KEY, TREND_TTL_MS, async () => {
+    try {
+      return await fetchArtificialAnalysis();
+    } catch (error) {
+      return emptyAaPanel(error);
+    }
+  });
+}
+
 export async function loadOverview(force = false): Promise<OverviewPanel> {
-  const [tokens, gpus, trends] = await Promise.all([
+  const [tokens, gpus, trends, analysis] = await Promise.all([
     loadTokenPanel(force),
     loadGpuPanel(force),
     loadTrends(force),
+    loadAnalysis(force),
   ]);
-  return { tokens, gpus, trends, fetchedAt: nowIso() };
+  return { tokens, gpus, trends, analysis, fetchedAt: nowIso() };
 }

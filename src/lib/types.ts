@@ -117,10 +117,34 @@ export interface GpuPanel {
   fetchedAt: string;
 }
 
+export interface AaModel {
+  id: string;
+  name: string;
+  slug: string;
+  creator: string;
+  intelligence: number | null;
+  coding: number | null;
+  agentic: number | null;
+  inputUsd: number | null;
+  outputUsd: number | null;
+  cacheReadUsd: number | null;
+  tokensPerSec: number | null;
+  ttftSec: number | null;
+  evalCostUsd: number | null;
+  releaseDate: string | null;
+}
+
+export interface AaPanel {
+  models: AaModel[];
+  source: SourceHealth;
+  indexVersion: number | null;
+}
+
 export interface OverviewPanel {
   tokens: TokenPanel;
   gpus: GpuPanel;
   trends: TrendsPanel;
+  analysis: AaPanel;
   fetchedAt: string;
 }
 
@@ -149,7 +173,12 @@ export interface GpuLanePoint {
 export interface TrendsPanel {
   consumption: SeriesPoint[];
   mix: ConsumptionMix[];
+  gatewayShare: SeriesPoint[];
+  gatewayLabs: SeriesPoint[];
   gpuLanes: GpuLanePoint[];
+  gpuLedgerLanes: GpuLanePoint[];
+  ornnGpuLanes: GpuLanePoint[];
+  ornnTokenPrices: SeriesPoint[];
   sources: SourceHealth[];
   fetchedAt: string;
 }

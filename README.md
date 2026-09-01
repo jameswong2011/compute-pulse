@@ -1,14 +1,16 @@
-# Meridian
+# Laniakea AI Research panel
 
 A research panel for **token consumption**, **token prices**, and **GPU rentals**, drawn from public sources.
 
-Meridian is a desk, not a broker. It leads with paths over time: the running pile of tokens consumed on OpenRouter, week-on-week change in that flow, and daily GPU medians split **on-demand vs secure**. Spot quotes and vendor rate cards stay on the tape. Catalog rows are list prices, not a promise of capacity.
+The Laniakea AI Research panel is a desk, not a broker. It leads with paths over time: weekly token volume on OpenRouter, week-on-week change in that flow, and daily GPU medians split **on-demand vs secure**. Spot quotes and vendor rate cards stay on the tape. Catalog rows are list prices, not a promise of capacity.
 
 ## What it tracks
 
 ### Token consumption
 
-A stacked running total of every prompt and completion token from the public [OpenRouter rankings](https://openrouter.ai/rankings) chart, with week-on-week change overlaid, plus this week's mix of prompt, completion, and reasoning. Cite as: Source: OpenRouter (openrouter.ai/rankings).
+Weekly prompt and completion tokens from the public [OpenRouter rankings](https://openrouter.ai/rankings) chart, stacked by model, with week-on-week change overlaid, plus this week's mix of prompt, completion, and reasoning. Cite as: Source: OpenRouter (openrouter.ai/rankings). This is volume, not USD spend.
+
+A second public series is [Vercel AI Gateway leaderboards](https://vercel.com/ai-gateway/leaderboards/models) (CC BY 4.0): weekly-average **share** of Gateway text token volume by model and by lab. Those are shares of Gateway traffic, not absolute tokens, and are not added to OpenRouter counts. First-party lab APIs and private gateways (Helicone, TokensAI, and similar) do not publish unauthenticated consumption time series.
 
 ### Token forms
 
@@ -23,7 +25,7 @@ Live token sources:
 
 USD per GPU-hour, normalized from instance price ÷ GPU count, **split on-demand vs secure**.
 
-Daily price paths come from the public [GPU Rental Prices](https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices) snapshot window (CC BY 4.0). On-demand includes list, community, and spot. Secure is secure-cloud and reserved.
+Daily price paths (last 6 months) come from the public [GPU Price Tracker](https://huggingface.co/datasets/afhubbard/gpu-prices) listings (CC BY 4.0). That dataset has no files from 10 Mar–6 May 2026. Live spot quotes still come from [GPU Rental Prices](https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices); those two baskets are not stitched onto one line. On-demand includes list, community, and spot. Secure is secure-cloud and reserved.
 
 Live GPU sources:
 
@@ -51,8 +53,8 @@ No API keys are required. Spot feeds cache for five minutes; consumption and GPU
 
 | Route | What you get |
 | --- | --- |
-| `/` | Cumulative stacked consumption with week-on-week overlay, GPU on-demand vs secure path, then the spot tape |
-| `/tokens` | Cumulative stack with week-on-week overlay, this week's mix, then every billed token form |
+| `/` | Cumulative stacked consumption (OpenRouter volume + Vercel Gateway share), GPU on-demand vs secure path, then the spot tape |
+| `/tokens` | Same consumption switcher, this week's mix, then every billed token form |
 | `/gpus` | Daily median path, then on-demand and secure rails |
 | `/compare` | Workload cost and GPU-versus-API sketch |
 | `/sources` | Source health, coverage, and methodology |

@@ -70,11 +70,15 @@ export function GpusView({
       <PageHeader
         kicker="GPU rentals"
         title="On-demand and secure, on two rails."
-        description="The same SKU, two markets. On-demand is self-serve list, community, and spot. Secure is datacenter isolation and reserved capacity. The path above the tables is the daily median from the public GPU rental ledger."
+        description="The same SKU, two markets. On-demand is self-serve list, community, and spot. Secure is datacenter isolation and reserved capacity. Toggle the path above the tables between Hubbard listings, GPU Rental Prices, and the Ornn Compute Price Index. Each source keeps its own chart. Listing paths are limited to H100, H200, B200, B200+, and A100; Ornn publishes H100 SXM, H200, B200, and A100 SXM4."
       />
 
       <div className="mb-6">
-        <GpuTrendCard points={trends.gpuLanes} />
+        <GpuTrendCard
+          points={trends.gpuLanes}
+          ledgerPoints={trends.gpuLedgerLanes}
+          ornnPoints={trends.ornnGpuLanes}
+        />
       </div>
 
       <div className="mb-4 grid gap-2 md:grid-cols-3">

@@ -17,6 +17,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
     ...data.tokens.sources,
     ...data.gpus.sources,
     ...data.trends.sources,
+    data.analysis.source,
   ];
   const live = sources.filter((s) => s.kind === "live");
   const catalog = sources.filter((s) => s.kind === "catalog");
@@ -26,7 +27,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Methodology"
         title="An exhaustive public panel."
-        description="Meridian only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings. GPU paths come from the public GPU Rental Prices snapshot window, split on-demand vs secure."
+        description="The Laniakea AI Research panel only quotes prices and volumes a researcher can retrieve without logging in, or that a vendor publishes as a rate card. Consumption series come from OpenRouter rankings (absolute tokens) and Vercel AI Gateway leaderboards (share of Gateway traffic). Ornn Data adds a public GPU transaction index and a four-lab token price index. Quality and speed come from Artificial Analysis. GPU listing paths stay on Hubbard and GPU Rental Prices."
       />
 
       <div className="mb-6 grid gap-3 md:grid-cols-3">
@@ -37,7 +38,7 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             </p>
             <p className="mt-2 font-heading text-3xl">{live.length}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Rankings, LiteLLM, RunPod, Vast, rental ledger
+              Rankings, Vercel Gateway, LiteLLM, RunPod, Vast, rental, Ornn
             </p>
           </CardContent>
         </Card>
@@ -91,21 +92,57 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
             mistaken for a token rate.
           </p>
           <p>
-            <span className="text-foreground">Token consumption.</span> The
-            stacked bars are a running total of every prompt and completion
-            token on OpenRouter, split across the largest models. The overlay
-            line is week-on-week change in that week&apos;s volume. The mix
-            table is this week&apos;s prompt, completion, and reasoning split.
-            Cite as OpenRouter (openrouter.ai/rankings). Tokenizers differ by
-            provider.
+            <span className="text-foreground">Token consumption.</span> OpenRouter
+            is the only public feed of absolute prompt and completion tokens
+            over time. The stacked bars are that week&apos;s volume, split
+            across the largest models, with week-on-week change overlaid. Vercel AI
+            Gateway leaderboards (CC BY 4.0) add a second series: weekly-average
+            share of Gateway text traffic by model and by lab. Shares are not
+            absolute tokens and are not added to OpenRouter counts. Labs do not
+            publish public consumption APIs. The mix table is still this
+            week&apos;s OpenRouter prompt, completion, and reasoning split.
+            Tokenizers differ by provider.
+          </p>
+          <p>
+            <span className="text-foreground">Ornn Data.</span> The public
+            Index tier at data.ornn.com needs no key. The GPU path toggle
+            labeled Ornn index is their Compute Price Index (OCPI): a
+            transaction-weighted USD/GPU-hour for H100 SXM, H200, B200, and
+            A100 SXM4 over the trailing 3 months. The token price card is
+            OTPI: a volume-weighted USD/million-tokens blend for Anthropic,
+            OpenAI, Google, and DeepSeek over the trailing month. Neither
+            series is mixed with Hubbard, GPU Rental Prices, or OpenRouter
+            volume.
+          </p>
+          <p>
+            <span className="text-foreground">Quality and speed.</span>{" "}
+            Artificial Analysis (free language-model API) supplies the
+            Intelligence, Coding, and Agentic indices, independent input/output
+            list prices, median output tokens/sec, and time-to-first-token.
+            Attribution:{" "}
+            <a
+              href="https://artificialanalysis.ai/"
+              className="underline-offset-4 hover:underline"
+            >
+              artificialanalysis.ai
+            </a>
+            . This is not token consumption. A key is required; without it the
+            desk stays empty, same pattern as Lambda.
           </p>
           <p>
             <span className="text-foreground">GPU hours.</span> Marketplace
             offers are reduced to USD per GPU-hour. The desk splits{" "}
             <span className="text-live">on-demand</span> (list, community, spot)
             from <span className="text-brass">secure</span> (secure-cloud and
-            reserved). The path is the daily median by SKU and rail from the
-            GPU Rental Prices Hugging Face snapshots, CC BY 4.0.
+            reserved). The GPU path card toggles three charts and only tracks
+            H100, H200, B200, B200+, and A100 on listing ledgers. Hubbard GPU
+            Price Tracker (CC BY 4.0) is the six-month listing median; that
+            dataset has no files from 10 Mar–6 May 2026. GPU Rental Prices
+            (CC BY 4.0) is its own on-demand vs secure path from the public
+            snapshot window (currently 5 Jul–31 Aug 2026). Ornn OCPI is a
+            third, transaction-weighted index over the trailing 3 months.
+            Live quotes use the rental ledger. The three baskets are never
+            mixed on one line.
           </p>
           <p>
             <span className="text-foreground">Catalog versus live.</span> Brass

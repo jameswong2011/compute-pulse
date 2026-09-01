@@ -1,4 +1,6 @@
+import { gpuPathWindow, observedGpuWindow } from "./dates";
 import { gpuLane } from "./format";
+import { PATH_GPUS } from "./lanes";
 import type {
   ConsumptionMix,
   GpuLanePoint,
@@ -79,22 +81,20 @@ function weekByKeys(
   return row;
 }
 
-/** Running total of every token, stacked by model, plus week-on-week flow change. */
+/** That week's tokens, stacked by model, plus week-on-week flow change. */
 export function consumptionStackedChart(points: SeriesPoint[]) {
   const keys = rankedKeys(points);
   const othersIndex = keys.length - 1;
-  const acc: Record<string, number> = Object.fromEntries(keys.map((k) => [k, 0]));
   const flows = points.map((point) => weekTotal(point.values));
   const data = points.map((point, i) => {
     const flow = weekByKeys(point, keys);
-    for (const key of keys) acc[key] += flow[key] ?? 0;
     const prev = i > 0 ? flows[i - 1] : 0;
     const wow = prev > 0 ? (flows[i] - prev) / prev : null;
     const row: Record<string, string | number | null> = {
       date: point.date.slice(5),
       [WOW_KEY]: wow,
     };
-    for (const key of keys) row[key] = acc[key];
+    for (const key of keys) row[key] = flow[key] ?? 0;
     return row;
   });
   const labels = seriesLabels(keys);
@@ -118,31 +118,100 @@ export function consumptionChart(points: SeriesPoint[]) {
   return consumptionStackedChart(points);
 }
 
-export function gpuLaneChart(points: GpuLanePoint[], gpu: string) {
-  const rows = points.filter((p) => p.gpu === gpu);
-  const data = rows.map((p) => ({
-    date: p.date.slice(5),
-    onDemand: p.onDemand,
-    secure: p.secure,
+/** Stacked share of a window (0–1), not a running total. */
+export function shareStackedChart(points: SeriesPoint[]) {
+  const keys = rankedKeys(points);
+  const othersIndex = keys.length - 1;
+  const data = points.map((point) => {
+    const flow = weekByKeys(point, keys);
+    const row: Record<string, string | number | null> = {
+      date: point.date.slice(5),
+    };
+    for (const key of keys) row[key] = flow[key] ?? 0;
+    return row;
+  });
+  const labels = seriesLabels(keys);
+  const series = keys.map((key, i) => ({
+    key,
+    label: labels[i],
+    color: i === othersIndex ? COLORS[COLORS.length - 1] : COLORS[i % (COLORS.length - 1)],
   }));
-  const series = [
-    {
-      key: "onDemand",
-      label: "On-demand",
-      color: "#3dceb0",
-    },
-    {
-      key: "secure",
-      label: "Secure",
-      color: "#e0b15a",
-      dashed: true,
-    },
-  ];
+  return { data, series, overlay: [] };
+}
+
+export function ornnTokenChart(points: SeriesPoint[]) {
+  const keys = ["anthropic", "openai", "google", "deepseek"];
+  const labels = ["Anthropic", "OpenAI", "Google", "DeepSeek"];
+  const data = points.map((point) => {
+    const row: Record<string, string | number | null> = {
+      date: point.date.slice(5),
+    };
+    for (const key of keys) row[key] = point.values[key] ?? null;
+    return row;
+  });
+  const series = keys.map((key, i) => ({
+    key,
+    label: labels[i],
+    color: COLORS[i % COLORS.length],
+  }));
   return { data, series };
 }
 
-export function gpuCohorts(points: GpuLanePoint[]): string[] {
-  return [...new Set(points.map((p) => p.gpu))].sort();
+export function gpuLaneChart(
+  points: GpuLanePoint[],
+  gpu: string,
+  now?: Date,
+  options?: {
+    fitObserved?: boolean;
+    onDemandLabel?: string;
+    secureLabel?: string;
+    indexOnly?: boolean;
+  },
+) {
+  const scoped = points.filter((p) => p.gpu === gpu);
+  const window = options?.fitObserved
+    ? observedGpuWindow(scoped, now)
+    : gpuPathWindow(now);
+  const byDate = new Map(
+    scoped.filter((p) => p.date >= window.start).map((p) => [p.date, p]),
+  );
+  const data = window.dates.map((date) => {
+    const row = byDate.get(date);
+    return {
+      date: date.slice(5),
+      onDemand: row?.onDemand ?? null,
+      secure: row?.secure ?? null,
+    };
+  });
+  const series: Array<{
+    key: string;
+    label: string;
+    color: string;
+    dashed?: boolean;
+  }> = [
+    {
+      key: "onDemand",
+      label: options?.onDemandLabel ?? "On-demand",
+      color: "#3dceb0",
+    },
+  ];
+  if (!options?.indexOnly) {
+    series.push({
+      key: "secure",
+      label: options?.secureLabel ?? "Secure",
+      color: "#e0b15a",
+      dashed: true,
+    });
+  }
+  return { data, series };
+}
+
+export function gpuCohorts(points: GpuLanePoint[], now?: Date): string[] {
+  const { start } = gpuPathWindow(now);
+  const present = new Set(
+    points.filter((p) => p.date >= start).map((p) => p.gpu),
+  );
+  return PATH_GPUS.filter((gpu) => present.has(gpu));
 }
 
 export function splitByLane(quotes: GpuQuote[]) {
