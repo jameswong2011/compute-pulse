@@ -1,3 +1,4 @@
+import { gpuPathWindow, snapshotDateFromPath } from "../dates";
 import { median } from "../format";
 import { fetchJson, nowIso, SourceError } from "../http";
 import { cohortGpu, laneFromKind } from "../lanes";
@@ -46,10 +47,15 @@ export async function fetchGpuHistory(): Promise<{
 }> {
   const fetchedAt = nowIso();
   try {
+    const { start } = gpuPathWindow();
     const tree = await fetchJson<TreeEntry[]>(TREE_URL);
     const paths = tree
       .map((e) => e.path)
-      .filter((p): p is string => typeof p === "string" && p.endsWith(".json"))
+      .filter((p): p is string => {
+        if (typeof p !== "string" || !p.endsWith(".json")) return false;
+        const date = snapshotDateFromPath(p);
+        return date != null && date >= start;
+      })
       .sort();
 
     const snaps = await mapPool(paths, 8, async (path) => {
@@ -91,9 +97,11 @@ export async function fetchGpuHistory(): Promise<{
       byDateGpu.set(id, row);
     }
 
-    const gpuLanes = [...byDateGpu.values()].sort((a, b) =>
-      a.date === b.date ? a.gpu.localeCompare(b.gpu) : a.date.localeCompare(b.date),
-    );
+    const gpuLanes = [...byDateGpu.values()]
+      .filter((row) => row.date >= start)
+      .sort((a, b) =>
+        a.date === b.date ? a.gpu.localeCompare(b.gpu) : a.date.localeCompare(b.date),
+      );
 
     return {
       gpuLanes,
@@ -105,7 +113,7 @@ export async function fetchGpuHistory(): Promise<{
         status: gpuLanes.length ? "ok" : "degraded",
         url: "https://huggingface.co/datasets/gpurentalprices/gpu-rental-prices",
         coverage:
-          "Daily on-demand vs secure median USD/GPU-hour from the public Hugging Face snapshot window (from 2026-07-05)",
+          "Daily on-demand vs secure median USD/GPU-hour from the public Hugging Face snapshot window (last 6 months)",
         fetchedAt,
         quoteCount: gpuLanes.length,
         notes:

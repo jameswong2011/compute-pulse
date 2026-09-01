@@ -17,12 +17,12 @@ export function GpuTrendCard({ points }: { points: GpuLanePoint[] }) {
     <Card className="overflow-visible">
       <CardHeader className="border-b">
         <CardTitle className="font-heading text-2xl">
-          GPU price path · on-demand vs secure
+          GPU price path · last 6 months
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Daily median USD per GPU-hour for {gpu}. Teal is on-demand
-          (including community and spot). Brass dashed is secure-cloud /
-          reserved.
+          Daily median USD per GPU-hour for {gpu} over the last 6 months.
+          Teal is on-demand (including community and spot). Brass dashed is
+          secure-cloud / reserved.
           {latest ? (
             <>
               {" "}

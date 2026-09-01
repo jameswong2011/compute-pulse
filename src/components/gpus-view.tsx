@@ -70,7 +70,7 @@ export function GpusView({
       <PageHeader
         kicker="GPU rentals"
         title="On-demand and secure, on two rails."
-        description="The same SKU, two markets. On-demand is self-serve list, community, and spot. Secure is datacenter isolation and reserved capacity. The path above the tables is the daily median from the public GPU rental ledger."
+        description="The same SKU, two markets. On-demand is self-serve list, community, and spot. Secure is datacenter isolation and reserved capacity. The path above the tables is the last six months of daily medians from the public GPU rental ledger."
       />
 
       <div className="mb-6">
