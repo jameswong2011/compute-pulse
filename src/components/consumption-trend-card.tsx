@@ -70,19 +70,20 @@ export function ConsumptionStackedCard({
         <CardTitle className="font-heading text-2xl">
           {isShare
             ? "Token share · Vercel AI Gateway"
-            : "Cumulative token consumption"}
+            : "Weekly token volume"}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           {active === "openrouter" ? (
             <>
-              Running total of every prompt and completion token on OpenRouter,
-              stacked across the largest models. The cream line is week-on-week
-              change in that week&apos;s volume (right axis). The current
-              incomplete week is held back.
+              Each bar is that week&apos;s prompt and completion tokens on
+              OpenRouter, stacked across the largest models — not a running
+              pile and not USD spend. The cream line is week-on-week change
+              in that same weekly volume (right axis). The current incomplete
+              week is held back.
               {total != null ? (
                 <>
                   {" "}
-                  Through the last complete week:{" "}
+                  Last complete week:{" "}
                   <span className="text-foreground">{formatTokens(total)}</span>
                   {wow != null ? (
                     <>
@@ -90,7 +91,7 @@ export function ConsumptionStackedCard({
                       <span className={wow >= 0 ? "text-live" : "text-destructive"}>
                         {formatPercent(wow)}
                       </span>{" "}
-                      week on week
+                      vs the prior week
                     </>
                   ) : null}
                   .

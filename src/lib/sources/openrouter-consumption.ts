@@ -99,7 +99,7 @@ export async function fetchOpenRouterConsumption(): Promise<{
         status: consumption.length ? "ok" : "degraded",
         url: "https://openrouter.ai/rankings",
         coverage:
-          "Cumulative token consumption by model (prompt + completion), week-on-week volume change, and this week's mix",
+          "Weekly token volume by model (prompt + completion), week-on-week change, and this week's mix",
         fetchedAt,
         quoteCount: consumption.length + mix.length,
         notes:

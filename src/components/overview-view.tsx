@@ -72,7 +72,7 @@ export function OverviewView({ data }: { data: OverviewPanel }) {
       <PageHeader
         kicker="Public markets · observed over time"
         title="Consumption and rental paths, not just the print."
-        description="The Laniakea AI Research panel tracks the running pile of tokens consumed on OpenRouter, share of Vercel AI Gateway traffic, Ornn's public GPU and token-price indices, Artificial Analysis quality and speed, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
+        description="The Laniakea AI Research panel tracks weekly token volume on OpenRouter, share of Vercel AI Gateway traffic, Ornn's public GPU and token-price indices, Artificial Analysis quality and speed, and how GPU rentals move when you split on-demand from secure capacity. Spot quotes are still on the tape."
       />
 
       <div className="mb-6 flex flex-wrap gap-2">

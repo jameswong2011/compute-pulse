@@ -81,22 +81,20 @@ function weekByKeys(
   return row;
 }
 
-/** Running total of every token, stacked by model, plus week-on-week flow change. */
+/** That week's tokens, stacked by model, plus week-on-week flow change. */
 export function consumptionStackedChart(points: SeriesPoint[]) {
   const keys = rankedKeys(points);
   const othersIndex = keys.length - 1;
-  const acc: Record<string, number> = Object.fromEntries(keys.map((k) => [k, 0]));
   const flows = points.map((point) => weekTotal(point.values));
   const data = points.map((point, i) => {
     const flow = weekByKeys(point, keys);
-    for (const key of keys) acc[key] += flow[key] ?? 0;
     const prev = i > 0 ? flows[i - 1] : 0;
     const wow = prev > 0 ? (flows[i] - prev) / prev : null;
     const row: Record<string, string | number | null> = {
       date: point.date.slice(5),
       [WOW_KEY]: wow,
     };
-    for (const key of keys) row[key] = acc[key];
+    for (const key of keys) row[key] = flow[key] ?? 0;
     return row;
   });
   const labels = seriesLabels(keys);

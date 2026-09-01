@@ -94,8 +94,8 @@ export function SourcesView({ data }: { data: OverviewPanel }) {
           <p>
             <span className="text-foreground">Token consumption.</span> OpenRouter
             is the only public feed of absolute prompt and completion tokens
-            over time. The stacked bars are that running total, split across the
-            largest models, with week-on-week volume change overlaid. Vercel AI
+            over time. The stacked bars are that week&apos;s volume, split
+            across the largest models, with week-on-week change overlaid. Vercel AI
             Gateway leaderboards (CC BY 4.0) add a second series: weekly-average
             share of Gateway text traffic by model and by lab. Shares are not
             absolute tokens and are not added to OpenRouter counts. Labs do not
