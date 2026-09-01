@@ -2,13 +2,13 @@
 
 A research panel for **token consumption**, **token prices**, and **GPU rentals**, drawn from public sources.
 
-The Laniakea AI Research panel is a desk, not a broker. It leads with paths over time: the running pile of tokens consumed on OpenRouter, week-on-week change in that flow, and daily GPU medians split **on-demand vs secure**. Spot quotes and vendor rate cards stay on the tape. Catalog rows are list prices, not a promise of capacity.
+The Laniakea AI Research panel is a desk, not a broker. It leads with paths over time: weekly token volume on OpenRouter, week-on-week change in that flow, and daily GPU medians split **on-demand vs secure**. Spot quotes and vendor rate cards stay on the tape. Catalog rows are list prices, not a promise of capacity.
 
 ## What it tracks
 
 ### Token consumption
 
-A stacked running total of every prompt and completion token from the public [OpenRouter rankings](https://openrouter.ai/rankings) chart, with week-on-week change overlaid, plus this week's mix of prompt, completion, and reasoning. Cite as: Source: OpenRouter (openrouter.ai/rankings).
+Weekly prompt and completion tokens from the public [OpenRouter rankings](https://openrouter.ai/rankings) chart, stacked by model, with week-on-week change overlaid, plus this week's mix of prompt, completion, and reasoning. Cite as: Source: OpenRouter (openrouter.ai/rankings). This is volume, not USD spend.
 
 A second public series is [Vercel AI Gateway leaderboards](https://vercel.com/ai-gateway/leaderboards/models) (CC BY 4.0): weekly-average **share** of Gateway text token volume by model and by lab. Those are shares of Gateway traffic, not absolute tokens, and are not added to OpenRouter counts. First-party lab APIs and private gateways (Helicone, TokensAI, and similar) do not publish unauthenticated consumption time series.
 
